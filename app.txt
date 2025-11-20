@@ -1,0 +1,98 @@
+
+import json
+import os
+import torch
+import re
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from modelscope import snapshot_download, AutoModelForCausalLM, AutoTokenizer
+
+# ==============================================================================
+# CONFIGURATION
+# ==============================================================================
+MODEL_ID = "qwen/Qwen2.5-1.5B-Instruct"
+PORT = 8088
+
+# ==============================================================================
+# SETUP
+# ==============================================================================
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+torch.set_default_device("cpu")
+
+app = Flask(__name__)
+CORS(app)
+
+print(f"🚀 Loading ModelScope Model: {MODEL_ID}...")
+try:
+    model_dir = snapshot_download(MODEL_ID)
+    tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_dir, 
+        trust_remote_code=True, 
+        device_map="cpu",
+        low_cpu_mem_usage=True
+    ).eval()
+    print("✅ Model Loaded Successfully.")
+except Exception as e:
+    print(f"❌ Failed to load model: {e}")
+    exit(1)
+
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    data = request.json or {}
+    text = data.get('text', '')
+    
+    if not text: 
+        return jsonify({"error": "Empty text"}), 400
+
+    print(f"📝 Analyzing: {text[:50]}...")
+
+    system_prompt = "You are a JSON-only emotion analysis API. Output strict JSON."
+    user_prompt = f"""
+    Analyze the emotion of this Chinese text: "{text}"
+    
+    Return a JSON object with this exact schema:
+    {{
+        "primary_emotion": "string (e.g. 快乐, 悲伤)",
+        "score": number (0-100),
+        "sentiment_polarity": number (-100 to 100),
+        "details": [
+            {{"name": "快乐", "value": number}},
+            {{"name": "悲伤", "value": number}},
+            {{"name": "愤怒", "value": number}},
+            {{"name": "恐惧", "value": number}},
+            {{"name": "惊讶", "value": number}},
+            {{"name": "厌恶", "value": number}}
+        ],
+        "emoji": "string (single unicode char)",
+        "theme_color": "hex string",
+        "comment": "string (short witty chinese comment)"
+    }}
+    """
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
+    
+    input_ids = tokenizer.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_tensors="pt"
+    )
+    
+    with torch.no_grad():
+        outputs = model.generate(input_ids, max_new_tokens=512, temperature=0.2)
+    
+    response = tokenizer.decode(outputs[0][len(input_ids[0]):], skip_special_tokens=True)
+    
+    # Clean Markdown
+    json_str = re.sub(r'```json|```', '', response).strip()
+    
+    try:
+        result = json.loads(json_str)
+        return jsonify(result)
+    except json.JSONDecodeError:
+        print(f"❌ JSON Parse Error. Raw: {response}")
+        return jsonify({"error": "Model failed to generate valid JSON", "raw": response}), 500
+
+if __name__ == '__main__':
+    app.run(port=PORT, host='0.0.0.0', threaded=False)

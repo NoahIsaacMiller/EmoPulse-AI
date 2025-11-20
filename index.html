@@ -3,62 +3,159 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EmoPulse AI - 情绪分析系统</title>
+    <title>EmoPulse - Kawaii Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --c-bg: #FFF5F7;
+        --c-pink: #FF9EB5;
+        --c-pink-dark: #FF7597;
+        --c-blue: #8FD3F4;
+        --c-blue-dark: #5FB8E6;
+        --c-yellow: #FDEB71;
+        --c-yellow-dark: #FAD93A;
+        --c-purple: #E0C3FC;
+        --c-purple-dark: #BE93E8;
+        --c-text: #5D5D81;
+        --c-white: #FFFFFF;
+      }
+
       body {
-        font-family: 'Noto Sans SC', sans-serif;
-        background-color: #f8fafc;
-        color: #0f172a;
+        font-family: 'Nunito', sans-serif;
+        background-color: var(--c-bg);
+        background-image: radial-gradient(var(--c-purple) 2.5px, transparent 2.5px);
+        background-size: 32px 32px;
+        color: var(--c-text);
+        overflow-x: hidden;
+        min-height: 100vh;
+        position: relative;
       }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
+      
+      h1, h2, h3, h4, h5, h6, button, .font-cute {
+        font-family: 'Fredoka', sans-serif;
       }
-      ::-webkit-scrollbar-track {
-        background: transparent; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-      }
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-      }
-      .blob {
-        position: absolute;
-        filter: blur(80px);
+
+      /* Animated Clouds */
+      .cloud {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 100px;
         z-index: -1;
-        opacity: 0.6;
-        animation: move 10s infinite alternate;
+        animation: floatCloud 20s infinite linear;
       }
-      @keyframes move {
-        from { transform: translate(0, 0) scale(1); }
-        to { transform: translate(20px, -20px) scale(1.1); }
+      .cloud::after, .cloud::before {
+        content: '';
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
       }
+      .c1 { width: 120px; height: 50px; top: 10%; left: -10%; animation-duration: 25s; }
+      .c1::after { width: 50px; height: 50px; top: -25px; left: 25px; }
+      .c1::before { width: 40px; height: 40px; top: -15px; left: 60px; }
+      
+      .c2 { width: 180px; height: 70px; top: 60%; right: -20%; animation-duration: 35s; animation-direction: reverse; }
+      .c2::after { width: 80px; height: 80px; top: -40px; left: 30px; }
+      .c2::before { width: 60px; height: 60px; top: -30px; left: 90px; }
+
+      @keyframes floatCloud {
+        from { transform: translateX(-100vw); }
+        to { transform: translateX(100vw); }
+      }
+
+      /* Kawaii Card System */
+      .cute-card {
+        background: var(--c-white);
+        border-radius: 2.5rem;
+        border: 4px solid;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      
+      .border-pink { border-color: var(--c-pink); box-shadow: 6px 6px 0px var(--c-pink-dark); }
+      .border-blue { border-color: var(--c-blue); box-shadow: 6px 6px 0px var(--c-blue-dark); }
+      .border-purple { border-color: var(--c-purple); box-shadow: 6px 6px 0px var(--c-purple-dark); }
+      .border-yellow { border-color: var(--c-yellow); box-shadow: 6px 6px 0px var(--c-yellow-dark); }
+
+      .cute-card:hover {
+        transform: translateY(-4px);
+      }
+
+      /* Squishy Buttons */
+      .squishy-btn {
+        border-radius: 1.5rem;
+        border: none;
+        font-weight: 700;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        position: relative;
+        top: 0;
+      }
+      .squishy-btn:active {
+        transform: scale(0.90);
+        top: 2px;
+      }
+      
+      .btn-primary {
+        background: linear-gradient(to bottom, #FF9EB5, #FF7597);
+        color: white;
+        box-shadow: 0 6px 0 #E04F75;
+      }
+      .btn-primary:active { box-shadow: 0 2px 0 #E04F75; }
+
+      .btn-secondary {
+        background: linear-gradient(to bottom, #8FD3F4, #5FB8E6);
+        color: white;
+        box-shadow: 0 6px 0 #3BA0D6;
+      }
+      .btn-secondary:active { box-shadow: 0 2px 0 #3BA0D6; }
+
+      .btn-ghost {
+        background: #F3F4F6;
+        color: #6B7280;
+        box-shadow: 0 6px 0 #D1D5DB;
+      }
+      .btn-ghost:active { box-shadow: 0 2px 0 #D1D5DB; }
+
+      /* Inputs */
+      .paper-input {
+        background-color: #FFF;
+        background-image: linear-gradient(#F1F5F9 2px, transparent 2px);
+        background-size: 100% 2rem;
+        line-height: 2rem;
+        border: 3px solid #E0C3FC;
+        border-radius: 1.5rem;
+        padding: 1rem;
+        color: var(--c-text);
+        transition: all 0.3s;
+      }
+      .paper-input:focus {
+        outline: none;
+        border-color: var(--c-pink);
+        box-shadow: 0 0 0 6px rgba(255, 158, 181, 0.2);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--c-purple); border-radius: 5px; border: 2px solid var(--c-bg); }
+      ::-webkit-scrollbar-thumb:hover { background: var(--c-pink); }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "recharts": "https://aistudiocdn.com/recharts@^3.4.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0"
-  }
-}
-</script>
-</head>
+    <script type="importmap">
+    {
+      "imports": {
+        "recharts": "https://aistudiocdn.com/recharts@^3.4.1",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+    </script>
+  </head>
   <body>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
     <div id="root"></div>
   </body>
 </html>

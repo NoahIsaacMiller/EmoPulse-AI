@@ -1,32 +1,33 @@
-export interface EmotionMetric {
-  emotion: string;
-  score: number; // 0 to 100
+
+export type ModelType = 'local' | 'cloud';
+export type TabType = 'overview' | 'details' | 'advice';
+
+export interface EmotionDetail {
+  name: string;
+  value: number;
 }
 
-export interface AnalysisResult {
-  primaryEmotion: string;
-  intensity: number; // 0 to 100
-  sentimentScore: number; // -100 (Negative) to 100 (Positive)
-  breakdown: EmotionMetric[];
-  keywords: string[];
-  suggestion: string;
-  colorHex: string; // Suggested color based on emotion
-  emoji: string; // Emoji representing the emotion
+export interface BackendResponse {
+  primary_emotion: string;
+  score: number; // 0 - 100
+  sentiment_polarity: number; // -100 - 100
+  details: EmotionDetail[];
+  emoji: string;
+  theme_color: string;
+  comment: string;
 }
 
 export interface HistoryItem {
   id: string;
   text: string;
   timestamp: number;
-  result: AnalysisResult;
+  data: BackendResponse;
+  model: ModelType;
 }
 
-export enum EmotionType {
-  JOY = '喜悦',
-  SADNESS = '悲伤',
-  ANGER = '愤怒',
-  FEAR = '恐惧',
-  SURPRISE = '惊讶',
-  DISGUST = '厌恶',
-  NEUTRAL = '平静'
+export interface AdviceItem {
+  title: string;
+  content: string;
+  icon: string;
+  color: string;
 }
